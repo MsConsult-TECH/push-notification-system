@@ -6,6 +6,7 @@ Publié par [MsConsult-TECH](https://github.com/MsConsult-TECH).
 
 ## Positionnement
 
+<<<<<<< HEAD
 Ce repo n'est pas un tutoriel.  
 C'est une **preuve d'architecture** montrant comment industrialiser un service de notifications push :
 
