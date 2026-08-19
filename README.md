@@ -1,6 +1,6 @@
-# Reliable Push Notifications — MsConsult-TECH
+# Push Notification System — MsConsult-TECH
 
-Backend TypeScript/Node.js d'envoi de notifications push fiables, combinant **FCM** (Firebase Cloud Messaging, API v1) pour le mobile et **Web Push** (VAPID) pour les Progressive Web Apps.
+Backend TypeScript/Node.js pour l'envoi de notifications push, combinant **FCM** (Firebase Cloud Messaging, API v1) pour le mobile et **Web Push** (VAPID) pour les Progressive Web Apps.
 
 Publié par [MsConsult-TECH](https://github.com/MsConsult-TECH).
 
@@ -34,8 +34,8 @@ Les décisions d'architecture sont documentées dans [`docs/adr-001-why-fcm-and-
 
 ```bash
 # 1. Cloner
-git clone https://github.com/MsConsult-TECH/reliable-push-notifications.git
-cd reliable-push-notifications
+git clone https://github.com/MsConsult-TECH/push-notification-system.git
+cd push-notification-system
 
 # 2. Installer
 npm install
@@ -64,7 +64,7 @@ npm run dev
 
 ## CI/CD
 
-![CI](https://github.com/MsConsult-TECH/reliable-push-notifications/workflows/CI/badge.svg)
+![CI](https://github.com/MsConsult-TECH/push-notification-system/workflows/CI/badge.svg)
 
 La pipeline GitHub Actions exécute :
 

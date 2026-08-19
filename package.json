@@ -1,7 +1,7 @@
 {
-  "name": "reliable-push-notifications",
+  "name": "push-notification-system",
   "version": "1.0.0",
-  "description": "Backend TypeScript d'envoi de notifications push fiables (FCM + Web Push).",
+  "description": "Backend TypeScript pour l'envoi de notifications push (FCM + Web Push).",
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node src/server.ts",
