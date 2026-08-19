@@ -1,6 +1,7 @@
 import { GoogleAuth } from 'google-auth-library';
 import { config } from './config';
 import { NotificationPayload } from './types';
+import { withRetry } from './retry';
 
 const FCM_SCOPE = 'https://www.googleapis.com/auth/cloud-platform';
 
@@ -15,7 +16,7 @@ function getServiceAccount(): object {
   throw new Error('FCM service account not configured');
 }
 
-export async function sendFcmMessage(token: string, payload: NotificationPayload): Promise<void> {
+async function sendFcmMessageOnce(token: string, payload: NotificationPayload): Promise<void> {
   const auth = new GoogleAuth({
     credentials: getServiceAccount(),
     scopes: [FCM_SCOPE],
@@ -64,4 +65,18 @@ export async function sendFcmMessage(token: string, payload: NotificationPayload
     const text = await response.text();
     throw new Error(`FCM send failed (${response.status}): ${text}`);
   }
+}
+
+export function sendFcmMessage(token: string, payload: NotificationPayload): Promise<void> {
+  return withRetry(() => sendFcmMessageOnce(token, payload), {
+    maxAttempts: 3,
+    delayMs: 500,
+    shouldRetry: (err) => {
+      // Retry sur les erreurs serveur temporaires de FCM (5xx).
+      if (err instanceof Error && /FCM send failed \(5\d{2}\)/.test(err.message)) {
+        return true;
+      }
+      return false;
+    },
+  });
 }

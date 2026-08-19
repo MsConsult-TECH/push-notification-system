@@ -1,12 +1,13 @@
 import webpush from 'web-push';
 import { config } from './config';
 import { NotificationPayload, PushSubscription } from './types';
+import { withRetry } from './retry';
 
 export function configureWebPush(): void {
   webpush.setVapidDetails(config.vapidSubject, config.vapidPublicKey, config.vapidPrivateKey);
 }
 
-export async function sendWebPush(
+async function sendWebPushOnce(
   subscription: PushSubscription,
   payload: NotificationPayload
 ): Promise<void> {
@@ -25,4 +26,14 @@ export async function sendWebPush(
     subscription as webpush.PushSubscription,
     JSON.stringify(notification)
   );
+}
+
+export function sendWebPush(
+  subscription: PushSubscription,
+  payload: NotificationPayload
+): Promise<void> {
+  return withRetry(() => sendWebPushOnce(subscription, payload), {
+    maxAttempts: 2,
+    delayMs: 500,
+  });
 }
