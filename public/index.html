@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MsConsult — Notifications Push Demo</title>
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 720px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      line-height: 1.6;
+    }
+    button {
+      padding: 0.75rem 1.5rem;
+      margin: 0.5rem 0;
+      cursor: pointer;
+      display: block;
+    }
+    input {
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 1rem;
+      overflow-x: auto;
+      min-height: 120px;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Notifications Push Demo</h1>
+  <p>
+    Démonstration d'enregistrement Web Push et d'envoi FCM.
+    Aucune donnée sensible n'est stockée côté serveur.
+  </p>
+
+  <h2>Web Push</h2>
+  <button id="subscribe">S'abonner aux notifications Web Push</button>
+  <button id="send-web" class="hidden">M'envoyer une notification Web</button>
+
+  <h2>FCM</h2>
+  <input id="fcm-token" type="text" placeholder="Token FCM de l'appareil">
+  <button id="send-fcm">Envoyer une notification FCM de test</button>
+
+  <h2>Journal</h2>
+  <pre id="log">En attente d'action...</pre>
+
+  <script>
+    const log = (msg) => {
+      const el = document.getElementById('log');
+      el.textContent += '\n' + msg;
+      el.scrollTop = el.scrollHeight;
+    };
+
+    // Remplacez par votre clé VAPID publique au moment du test.
+    const publicVapidKey = 'PASTE_YOUR_VAPID_PUBLIC_KEY_HERE';
+
+    function urlBase64ToUint8Array(base64String) {
+      const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+      const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+      const rawData = window.atob(base64);
+      return Uint8Array.from([...rawData].map((c) => c.charCodeAt(0)));
+    }
+
+    async function registerServiceWorker() {
+      if (!('serviceWorker' in navigator)) {
+        log('Service workers non supportés.');
+        return null;
+      }
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      log('Service worker enregistré.');
+      return reg;
+    }
+
+    async function subscribe() {
+      if (publicVapidKey.includes('PASTE_YOUR')) {
+        log('Clé VAPID publique non configurée dans index.html.');
+        return;
+      }
+
+      const reg = await registerServiceWorker();
+      if (!reg) return;
+
+      const subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicVapidKey),
+      });
+
+      await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'web', subscription }),
+      });
+
+      log('Abonnement Web Push enregistré.');
+      document.getElementById('send-web').classList.remove('hidden');
+      localStorage.setItem('push_subscription', JSON.stringify(subscription));
+    }
+
+    async function sendWeb() {
+      const subscription = JSON.parse(localStorage.getItem('push_subscription') || '{}');
+      const res = await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target: 'web',
+          subscription,
+          payload: { title: 'Hello Web Push', body: 'Ceci est une notification de démo.' },
+        }),
+      });
+      log('Réponse Web: ' + (await res.text()));
+    }
+
+    async function sendFcm() {
+      const token = document.getElementById('fcm-token').value;
+      if (!token) {
+        log('Token FCM requis.');
+        return;
+      }
+      const res = await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target: 'fcm',
+          token,
+          payload: { title: 'Hello FCM', body: 'Ceci est une notification FCM de démo.' },
+        }),
+      });
+      log('Réponse FCM: ' + (await res.text()));
+    }
+
+    document.getElementById('subscribe').addEventListener('click', subscribe);
+    document.getElementById('send-web').addEventListener('click', sendWeb);
+    document.getElementById('send-fcm').addEventListener('click', sendFcm);
+  </script>
+</body>
+</html>
