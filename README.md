@@ -6,7 +6,8 @@ Publié par [MsConsult-TECH](https://github.com/MsConsult-TECH).
 
 ## Positionnement
 
-Ce repo n'est pas un tutoriel. C'est une **preuve d'architecture** montrant comment industrialiser un service de notifications push :
+Ce repo n'est pas un tutoriel.  
+C'est une **preuve d'architecture** montrant comment industrialiser un service de notifications push :
 
 - code typé et testé,
 - gestion des secrets par variables d'environnement,
