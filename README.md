@@ -1,6 +1,7 @@
 # MsConsult-TECH — Push Notification System
 
-Backend TypeScript/Node.js pour l'envoi de notifications push, combinant **FCM** (Firebase Cloud Messaging, API v1) pour le mobile et **Web Push** (VAPID) pour les Progressive Web Apps.
+Backend TypeScript/Node.js pour l'envoi de notifications push, combinant **FCM** (Firebase Cloud Messaging, API v1) pour le mobile  
+et **Web Push** (VAPID) pour les Progressive Web Apps.
 
 Publié par [MsConsult-TECH](https://github.com/MsConsult-TECH).
 
